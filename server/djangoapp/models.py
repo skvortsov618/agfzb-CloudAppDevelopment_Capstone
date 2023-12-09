@@ -44,8 +44,6 @@ class CarModel(models.Model):
 
 # <HINT> Create a plain Python class `CarDealer` to hold dealer data
 class CarDealer():
-    _id = None
-    _rev = None
     id = None
     city = None
     state = None
@@ -56,9 +54,28 @@ class CarDealer():
     long = None
     short_name = None
     full_name = None
+    def __init__(self, address, city, state, full_name, id, lat, long, short_name, st, zip):
+        # Dealer address
+        self.address = address
+        # Dealer city
+        self.city = city
+        # Dealer state
+        self.state = state
+        # Dealer Full Name
+        self.full_name = full_name
+        # Dealer id
+        self.id = id
+        # Location lat
+        self.lat = lat
+        # Location long
+        self.long = long
+        # Dealer short name
+        self.short_name = short_name
+        # Dealer state
+        self.st = st
+        # Dealer zip
+        self.zip = zip
     def from_json(j):
-        self._id = j["_id"]
-        self._rev = j["_rev"]
         self.id = j["id"]
         self.city = j["city"]
         self.state = j["state"]
@@ -70,27 +87,35 @@ class CarDealer():
         self.short_name = j["short_name"]
         self.full_name = j["full_name"]
     def __str__(self):
-        return self.full_name
+        return "Dealer name: " + self.full_name
 
 
 # <HINT> Create a plain Python class `DealerReview` to hold review data
 class DealerReview():
-    _id = None
-    _rev = None
-    another = None
-    car_make = None
-    car_model = None
-    car_year = None
-    dealership = None
-    id = None
-    name = None
-    purchase = None
-    purchase_date = None
-    review = None
+    car_make = None#
+    car_model = None#
+    car_year = None#
+    dealership = None#
+    id = None#
+    name = None#
+    purchase = None#
+    purchase_date = None#
+    review = None#
+    sentiment = None#
+    def __init__(self, car_make, car_model, car_year, dealership, id, name, purchase, 
+                purchase_date, review, sentiment=""
+                ):
+        self.car_make = car_make
+        self.car_model = car_model
+        self.car_year = car_year
+        self.dealership = dealership
+        self.id = id
+        self.name = name
+        self.purchase = purchase
+        self.purchase_date = purchase_date
+        self.review = review
+        self.sentiment = sentiment
     def from_json(j):
-        self._id = j["_id"]
-        self._rev = j["_rev"]
-        self.another = j["another"]
         self.car_make = j["car_make"]
         self.car_model = j["car_model"]
         self.car_year = j["car_year"]
