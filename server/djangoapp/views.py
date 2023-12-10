@@ -3,12 +3,13 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 # from .models import related models
-from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf 
+from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf, post_request
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime
 import logging
 import json
+from django.views.decorators.csrf import csrf_exempt
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -126,4 +127,23 @@ def get_dealer_details(request, dealer_id):
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
 # ...
-
+@csrf_exempt
+def add_review(request):
+    context = {}
+    if request.method == 'GET':
+        return render(request, 'djangoapp/index.html', context)
+    elif request.method == 'POST':
+        url = "https://edudspro-5000.theiadocker-2-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/post_review"
+        review = {
+            "car_make": request.POST['car_make'],
+            "car_model": request.POST['car_model'],
+            "car_year": request.POST['car_year'],
+            "purchase_date": request.POST['purchase_date'],
+            "purchase": request.POST['purchase'],
+            "review": request.POST['review'],
+            "dealership": request.POST['dealership'],
+            "name": request.POST['name'],
+            "id": request.POST['id'],
+        }
+        responce = post_request(url, review)
+        return HttpResponse(str(responce))
