@@ -25,13 +25,13 @@ def get_request(url, **kwargs):
 # e.g., response = requests.post(url, params=kwargs, json=payload)
 def post_request(url, json_payload, **kwargs):
     api_key = "_oY17kD5rUZN_rjp2nwgrvTwrc1Eepjf8uIq1IkHXM1a"
-    try:
-        response = requests.post(url, headers={'Content-Type': 'application/json'},
-            auth=HTTPBasicAuth('apikey', api_key), json = json_payload,
-            params=kwargs
-        )
-    except:
-        print("Network exception occured")
+    # try:
+    response = requests.post(url, headers={'Content-Type': 'application/json'},
+        auth=HTTPBasicAuth('apikey', api_key), json = json_payload,
+        params=kwargs
+    )
+    # except:
+    #     print("Network exception occured")
     status_code = response.status_code
     print("With status {} ".format(status_code))
     json_data = json.loads(response.text)
@@ -60,7 +60,6 @@ def get_dealers_from_cf(url, **kwargs):
                                     short_name=dealer_doc["short_name"],
                                     st=dealer_doc["st"], zip=dealer_doc["zip"])
             results.append(dealer_obj)
-
     return results
 
 # Create a get_dealer_reviews_from_cf method to get reviews by dealer id from a cloud function
@@ -69,7 +68,7 @@ def get_dealers_from_cf(url, **kwargs):
 # - Parse JSON results into a DealerView object list
 def get_dealer_reviews_from_cf(url, dealerId):
     results = []
-    json_result = get_request(url+"?id="+str(dealerId)) #TODO improve parse
+    json_result = get_request(url+"?id="+str(dealerId))
     if json_result:
         reviews = json_result
         for review in reviews:
@@ -81,8 +80,19 @@ def get_dealer_reviews_from_cf(url, dealerId):
                                     review=reviews_doc["review"], sentiment="")
             review_obj.sentiment = analyze_review_sentiments(review_obj.review)
             results.append(review_obj)
-
     return results
+
+def get_dealer_by_id_from_cf(url, dealerId):
+    json_result = get_request(url+"?id="+str(dealerId))
+    if json_result:
+        dealer = json_result[0]
+        dealer_obj = CarDealer(address=dealer["address"], city=dealer["city"], state=dealer["state"],
+                                full_name=dealer["full_name"],
+                                id=dealer["id"], lat=dealer["lat"], long=dealer["long"],
+                                short_name=dealer["short_name"],
+                                st=dealer["st"], zip=dealer["zip"])
+        return dealer_obj
+    return None
 
 # Create an `analyze_review_sentiments` method to call Watson NLU and analyze text
 # def analyze_review_sentiments(text):
@@ -103,7 +113,7 @@ def analyze_review_sentiments(dealerreview):
     json_req = json.dumps(req_body)
     print(json_req)
     response = requests.post(url, json=req_body, headers=headers, auth=HTTPBasicAuth('apikey', api_key))
-    print(response)
+    print(str(response.status_code)+" "+response.text)
     if response.status_code != 200:
         return ""
     json_data = json.loads(response.text)
